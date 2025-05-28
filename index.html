@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <title>Personal Coach</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .stats {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .nav {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 1rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow-x: auto;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .nav-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.8rem;
+            color: #333;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #64748b;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .form-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-card h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .form-card input,
+        .form-card select,
+        .form-card textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .form-card textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .sliders {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .slider-group {
+            text-align: center;
+        }
+
+        .slider-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .slider-group input[type="range"] {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider-group span {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .goal-card, .entry-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .goal-card:hover, .entry-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .goal-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .goal-progress {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .goal-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .level-card {
+            background: linear-gradient(135deg, #8B5CF6, #EC4899);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .level-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .level-card .progress-bar {
+            background: rgba(255,255,255,0.2);
+            margin-top: 1rem;
+        }
+
+        .level-card .progress-fill {
+            background: white;
+        }
+
+        .rewards-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .reward-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reward-btn {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .reward-btn:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            cursor: pointer;
+            font-weight: 600;
+            z-index: 1000;
+        }
+
+        .entry-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .entry-stat {
+            text-align: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .entry-stat.mood {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .entry-stat.energy {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .entry-stat.productivity {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .entry-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .entry-stat-label {
+            font-size: 0.8rem;
+        }
+
+        .entry-notes {
+            background: #F8FAFC;
+            padding: 1rem;
+            border-radius: 8px;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .nav {
+                padding: 0 0.5rem 1rem;
+            }
+            
+            .nav-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+            
+            .main {
+                padding: 1rem 0.5rem;
+            }
+            
+            .hero {
+                padding: 1.5rem;
+            }
+            
+            .hero h2 {
+                font-size: 1.5rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .form-buttons {
+                flex-direction: column;
+            }
+            
+            .sliders {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-content">
+                <h1>🚀 Personal Coach</h1>
+                <div class="stats">
+                    <span id="points">1250</span> bodov | 
+                    <span id="level">Lvl 5</span>
+                </div>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn active" data-tab="dashboard">📊 Dashboard</button>
+                <button class="nav-btn" data-tab="goals">🎯 Ciele</button>
+                <button class="nav-btn" data-tab="journal">📝 Denník</button>
+                <button class="nav-btn" data-tab="rewards">🏆 Odmeny</button>
+            </nav>
+        </header>
+
+        <main class="main">
+            <!-- Dashboard -->
+            <div id="dashboard" class="tab-content active">
+                <div class="hero">
+                    <h2>Vitajte späť! 🚀</h2>
+                    <p>Dnes je váš 12. deň v rade. Pokračujte!</p>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">1250</div>
+                            <div class="stat-label">Bodov</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Lvl 5</div>
+                            <div class="stat-label">Úroveň</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Dní v rade</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>🎯 Aktívne ciele</h3>
+                        <div id="active-goals"></div>
+                    </div>
+                    <div class="card">
+                        <h3>📝 Posledné záznamy</h3>
+                        <div id="recent-entries"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ciele -->
+            <div id="goals" class="tab-content">
+                <div class="section-header">
+                    <h2>🎯 Moje ciele</h2>
+                    <button id="add-goal-btn" class="btn-primary">+ Nový cieľ</button>
+                </div>
+                
+                <div id="goal-form" class="form-card hidden">
+                    <h3>Vytvorenie nového cieľa</h3>
+                    <input id="goal-title" type="text" placeholder="Názov cieľa" required>
+                    <select id="goal-category">
+                        <option value="personal">🧠 Osobný rozvoj</option>
+                        <option value="fitness">💪 Fitness</option>
+                        <option value="wellness">🧘 Wellness</option>
+                    </select>
+                    <input id="goal-deadline" type="date">
+                    <div class="form-buttons">
+                        <button id="save-goal" class="btn-primary">Vytvoriť cieľ</button>
+                        <button id="cancel-goal" class="btn-secondary">Zrušiť</button>
+                    </div>
+                </div>
+                
+                <div id="goals-list"></div>
+            </div>
+
+            <!-- Denník -->
+            <div id="journal" class="tab-content">
+                <div class="section-header">
+                    <h2>📝 Denník</h2>
+                    <button id="add-entry-btn" class="btn-primary">+ Nový záznam</button>
+                </div>
+                
+                <div id="entry-form" class="form-card hidden">
+                    <h3>Denný záznam</h3>
+                    <div class="sliders">
+                        <div class="slider-group">
+                            <label>😊 Nálada (1-5)</label>
+                            <input id="mood-slider" type="range" min="1" max="5" value="3">
+                            <span id="mood-value">3</span>
+                        </div>
+                        <div class="slider-group">
+                            <label>⚡ Energia (1-5)</label>
+                            <input id="energy-slider" type="range" min="1" max="5" value="3">
+                            <span id="energy-value">3</span>
+                        </div>
+                        <div class="slider-group">
+                            <label>📈 Produktivita (1-5)</label>
+                            <input id="productivity-slider" type="range" min="1" max="5" value="3">
+                            <span id="productivity-value">3</span>
+                        </div>
+                    </div>
+                    <textarea id="entry-notes" placeholder="Ako prebehol váš deň?"></textarea>
+                    <div class="form-buttons">
+                        <button id="save-entry" class="btn-primary">Uložiť záznam (+50 bodov)</button>
+                        <button id="cancel-entry" class="btn-secondary">Zrušiť</button>
+                    </div>
+                </div>
+                
+                <div id="entries-list"></div>
+            </div>
+
+            <!-- Odmeny -->
+            <div id="rewards" class="tab-content">
+                <h2>🏆 Systém odmeňovania</h2>
+                <div class="level-card">
+                    <h3>Vaša úroveň: 5</h3>
+                    <p>Do ďalšej úrovne potrebujete ešte 250 bodov</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%"></div>
+                    </div>
+                </div>
+                
+                <div class="rewards-grid">
+                    <div class="reward-card">
+                        <span>Extra 30 min spánku</span>
+                        <button class="reward-btn">100 bodov</button>
+                    </div>
+                    <div class="reward-card">
+                        <span>Obľúbená sladkosť</span>
+                        <button class="reward-btn">200 bodov</button>
+                    </div>
+                    <div class="reward-card">
+                        <span>Nový film/seriál</span>
+                        <button class="reward-btn">300 bodov</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="install-prompt" class="install-prompt hidden">
+        📱 Pridať na plochu
+    </div>
+
+    <script>
+        // Personal Coach PWA - Main Application Logic
+        class PersonalCoach {
+            constructor() {
+                this.data = {
+                    goals: [],
+                    entries: [],
+                    stats: {
+                        points: 1250,
+                        level: 5,
+                        streak: 12
+                    }
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.loadData();
+                this.setupEventListeners();
+                this.setupServiceWorker();
+                this.setupInstallPrompt();
+                this.renderDashboard();
+            }
+            
+            loadData() {
+                // Load from localStorage
+                const savedData = localStorage.getItem('personalCoachData');
+                if (savedData) {
+                    this.data = { ...this.data, ...JSON.parse(savedData) };
+                } else {
+                    // Demo data
+                    this.data.goals = [
+                        { id: '1', title: 'Cvičiť 4x týždenne', progress: 75, category: 'fitness', deadline: '2025-06-30' },
+                        { id: '2', title: 'Čítať 20 min denne', progress: 60, category: 'personal', deadline: '2025-07-15' },
+                        { id: '3', title: 'Meditácia každé ráno', progress: 85, category: 'wellness', deadline: '2025-12-31' }
+                    ];
+                    
+                    this.data.entries = [
+                        { id: '1', date: '2025-05-27', mood: 4, energy: 3, productivity: 4, notes: 'Dobrý deň, dokončil som všetky úlohy' },
+                        { id: '2', date: '2025-05-26', mood: 5, energy: 4, productivity: 5, notes: 'Skvelý tréning a produktívny deň' }
+                    ];
+                }
+            }
+            
+            saveData() {
+                localStorage.setItem('personalCoachData', JSON.stringify(this.data));
+            }
+            
+            setupEventListeners() {
+                // Navigation
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const tab = e.target.dataset.tab;
+                        this.switchTab(tab);
+                    });
+                });
+                
+                // Goals
+                document.getElementById('add-goal-btn').addEventListener('click', () => {
+                    document.getElementById('goal-form').classList.remove('hidden');
+                });
+                
+                document.getElementById('cancel-goal').addEventListener('click', () => {
+                    document.getElementById('goal-form').classList.add('hidden');
+                });
+                
+                document.getElementById('save-goal').addEventListener('click', () => {
+                    this.addGoal();
+                });
+                
+                // Journal
+                document.getElementById('add-entry-btn').addEventListener('click', () => {
+                    document.getElementById('entry-form').classList.remove('hidden');
+                });
+                
+                document.getElementById('cancel-entry').addEventListener('click', () => {
+                    document.getElementById('entry-form').classList.add('hidden');
+                });
+                
+                document.getElementById('save-entry').addEventListener('click', () => {
+                    this.addEntry();
+                });
+                
+                // Sliders
+                ['mood', 'energy', 'productivity'].forEach(type => {
+                    const slider = document.getElementById(`${type}-slider`);
+                    const value = document.getElementById(`${type}-value`);
+                    slider.addEventListener('input', () => {
+                        value.textContent = slider.value;
+                    });
+                });
+            }
+            
+            async setupServiceWorker() {
+                if ('serviceWorker' in navigator) {
+                    try {
+                        await navigator.serviceWorker.register('./sw.js');
+                        console.log('Service Worker registered');
+                    } catch (error) {
+                        console.log('Service Worker registration failed');
+                    }
+                }
+            }
+            
+            setupInstallPrompt() {
+                let deferredPrompt;
+                
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    document.getElementById('install-prompt').classList.remove('hidden');
+                });
+                
+                document.getElementById('install-prompt').addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        deferredPrompt = null;
+                        document.getElementById('install-prompt').classList.add('hidden');
+                    }
+                });
+            }
+            
+            switchTab(tabName) {
+                // Update nav buttons
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                
+                // Update content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tabName).classList.add('active');
+                
+                // Render specific content
+                switch(tabName) {
+                    case 'goals':
+                        this.renderGoals();
+                        break;
+                    case 'journal':
+                        this.renderJournal();
+                        break;
+                }
+            }
+            
+            addGoal() {
+                const title = document.getElementById('goal-title').value;
+                const category = document.getElementById('goal-category').value;
+                const deadline = document.getElementById('goal-deadline').value;
+                
+                if (!title.trim()) return;
+                
+                const newGoal = {
+                    id: Date.now().toString(),
+                    title,
+                    category,
+                    deadline,
+                    progress: 0,
+                    createdAt: new Date().toISOString()
+                };
+                
+                this.data.goals.push(newGoal);
+                this.saveData();
+                
+                // Reset form
+                document.getElementById('goal-title').value = '';
+                document.getElementById('goal-deadline').value = '';
+                document.getElementById('goal-form').classList.add('hidden');
+                
+                this.renderGoals();
+                this.renderDashboard();
+            }
+            
+            addEntry() {
+                const mood = document.getElementById('mood-slider').value;
+                const energy = document.getElementById('energy-slider').value;
+                const productivity = document.getElementById('productivity-slider').value;
+                const notes = document.getElementById('entry-notes').value;
+                
+                const newEntry = {
+                    id: Date.now().toString(),
+                    date: new Date().toISOString().split('T')[0],
+                    mood: parseInt(mood),
+                    energy: parseInt(energy),
+                    productivity: parseInt(productivity),
+                    notes,
+                    createdAt: new Date().toISOString()
+                };
+                
+                this.data.entries.unshift(newEntry);
+                this.data.stats.points += 50;
+                this.saveData();
+                
+                // Reset form
+                document.getElementById('mood-slider').value = 3;
+                document.getElementById('energy-slider').value = 3;
+                document.getElementById('productivity-slider').value = 3;
+                document.getElementById('mood-value').textContent = 3;
+                document.getElementById('energy-value').textContent = 3;
+                document.getElementById('productivity-value').textContent = 3;
+                document.getElementById('entry-notes').value = '';
+                document.getElementById('entry-form').classList.add('hidden');
+                
+                this.renderJournal();
+                this.renderDashboard();
+                this.updateStats();
+            }
+            
+            updateGoalProgress(goalId) {
+                const newProgress = prompt('Zadajte nový pokrok (0-100):');
+                if (newProgress === null || isNaN(newProgress)) return;
+                
+                const progress = Math.min(100, Math.max(0, parseInt(newProgress)));
+                const goal = this.data.goals.find(g => g.id === goalId);
+                
+                if (goal) {
+                    goal.progress = progress;
+                    if (progress === 100) {
+                        this.data.stats.points += 200;
+                    }
+                    this.saveData();
+                    this.renderGoals();
+                    this.renderDashboard();
+                    this.updateStats();
+                }
+            }
+            
+            updateStats() {
+                document.getElementById('points').textContent = this.data.stats.points;
+                document.getElementById('level').textContent = `Lvl ${this.data.stats.level}`;
+            }
+            
+            renderDashboard() {
+                // Active goals
+                const activeGoals = this.data.goals.filter(g => g.progress < 100).slice(0, 3);
+                const activeGoalsHtml = activeGoals.length ? 
+                    activeGoals.map(goal => `
+                        <div class="goal-card" onclick="app.updateGoalProgress('${goal.id}')">
+                            <div class="goal-header">
+                                <span class="goal-title">${goal.title}</span>
+                                <span class="goal-progress">${goal.progress}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${goal.progress}%"></div>
+                            </div>
+                            <div class="goal-meta">
+                                <span>${goal.category}</span>
+                                <span>${goal.deadline ? new Date(goal.deadline).toLocaleDateString('sk-SK') : ''}</span>
+                            </div>
+                        </div>
+                    `).join('') :
+                    '<p style="text-align: center;
